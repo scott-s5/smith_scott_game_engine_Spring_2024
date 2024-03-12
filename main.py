@@ -1,5 +1,9 @@
 # This file was created by: Scott Smith
 
+'''
+goals: moving obstacles, increasing speed of enemies, force field
+verbs: Walks (WIP)
+'''
 #import neccesary modules
 import pygame as pg 
 import sys
@@ -8,7 +12,24 @@ from sprites import *
 from random import randint
 from os import path 
 from time import sleep
-    #initilizing the class
+from math import floor
+#initilizing the class
+class Cooldown():
+    def __init__(self):
+        self.current_time = 0
+        self.event_time = 0
+        self.delta = 0
+    def ticking(self):
+        self.current_time = floor((pg.time.get_ticks())/1000)
+        self.delta = self.current_time - self.event_time
+    def countdown(self, x):
+        x = x - self.delta
+        if x != None:
+            return x
+    def event_reset(self):
+        self.event_time = floor((pg.time.get_ticks())/1000) 
+    def timer(self):
+        self.current_time = floor((pg.time.get_ticks())/1000)
 class Game:
     def __init__(self):
         pg.init()
@@ -28,9 +49,12 @@ class Game:
                 # print(enumerate(self.map_data))
     def new(self):
         # init all variables, setup groups, instantiate classes
+        self.cooldown = Cooldown()
+        self.test_timer = Cooldown()
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.power_ups = pg.sprite.Group()
+        self.mob = pg.sprite.Group()
         # self.player = Player(self, 10, 10)
         # for x in range(10, 20):
         #     Wall(self, x, 5)
@@ -44,11 +68,9 @@ class Game:
                 if tile == 'P':
                     self.player = Player(self, col, row)
                 if tile == 'U':
-                    PowerUp (self, col, row)
-                if tile == 'F':
-                    Food(self, col, row)
-                # if tile == 'M':
-                #     Mob(self, col, row)
+                    PowerUp(self, col, row)
+                if tile == 'M':
+                    Mob(self, col, row)
     # defined the run method in our game engine
     def run(self):
         self.playing = True
@@ -61,7 +83,9 @@ class Game:
         pg.quit()
         sys.exit()
     def update(self):
+        self.cooldown.ticking()
         self.all_sprites.update()
+        # self.cooldown.ticking()
     #created the grid
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -73,21 +97,15 @@ class Game:
         self.screen.fill(BGCOLOR)
         self.draw_grid()
         self.all_sprites.draw(self.screen)
+        # self.draw_text(self.screen, str(self.cooldown.current_time), 24, WHITE, WIDTH/2 - 32, 2)
+        # self.draw_text(self.screen, str(self.cooldown.event_time), 24, WHITE, WIDTH/2 - 32, 80)
+        # self.draw_text(self.screen, str(self.cooldown.get_countdown()), 24, WHITE, WIDTH/2 - 32, 120) 
         pg.display.flip()
     #instantiated the input system to set up keys
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
-        #     if event.type == pg.KEYDOWN:
-        #       if event.key == pg.K_LEFT:
-        #          self.player.move(dx=-1)
-        #       if event.key == pg.K_RIGHT:
-        #          self.player.move(dx=1)
-        #       if event.key == pg.K_UP:
-        #           self.player.move(dy=-1)
-        #       if event.key == pg.K_DOWN:
-        #           self.player.move(dy=1)
     def draw_text(self, surface, text, size, color, x, y):
         font_name = pg.font.match_font('arial')
         font = pg.font.Font(font_name, size)

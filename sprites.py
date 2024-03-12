@@ -13,6 +13,7 @@ from settings import *
 class Player(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
+        #instantiate super class
         Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
@@ -21,6 +22,9 @@ class Player(Sprite):
         self.vx, self.vy = 0, 0
         self.x = x * TILESIZE
         self.y = y * TILESIZE   
+        self.speed = 300
+        self.hitpoints = 100
+        self.cooling = False
         # self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         # self.running = True
     # def input(self):
@@ -48,9 +52,16 @@ class Player(Sprite):
             self.vy *= 0.7071
     def collide_with_obj(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
-        if hits and desc == "food":
-            print("I collided with a", group)
-            self.image.fill(GREEN)
+        if hits:
+            if str(hits[0].__class__.__name__) == "Coin":
+                self.moneybag += 1
+            if str(hits[0].__class__.__name__) == "PowerUp":
+                print(hits[0].__class__.__name__)
+                effect = choice(POWER_UP_EFFECTS)
+                self.game.cooldown.cd = 5
+                self.cooling = True
+                print(effect)
+                print(self.cooling)
     def collide_with_walls(self, dir):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
@@ -83,10 +94,15 @@ class Player(Sprite):
         self.rect.y = self.y
         # add y collision later
         self.collide_with_walls('y')
-        self.collide_with_obj(self.game.power_ups, True, "powerup")
-        self.collide_with_obj(self.game.foods, True, "food")
+        self.collide_with_obj(self.game.power_ups, "powerup")
+        # if self.game.cooldown.cd < 1:
+        #     self.cooling = False
+        # self.collide_with_obj(self.game.foods, "food")
         self.rect.width = self.rect.width
         self.rect.height = self.rect.height
+        if not self.cooling:
+            self.collide_with_obj(self.game.power_ups, True)
+        # self.collide_with_obj(self.game.mobs, False)
         
 #creating wall class
 class Wall(Sprite):
@@ -114,19 +130,49 @@ class PowerUp(Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-class Food(Sprite):
+class Mob(Sprite):
     def __init__(self, game, x, y):
         # add powerup groups later....
-        self.groups = game.all_sprites, game.foods
-        Sprite.__init__(self, self.groups)
+        self.groups = game.all_sprites, game.mob
+        pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(LIGHTGRAY)
+        self.image.fill(MAGENTA)
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
+        self.vx, self.vy = 100, 100
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+    def collide_with_walls(self, dir):
+        if dir == 'x':
+            # print('colliding on the x')
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                self.vx *= -1
+                self.rect.x = self.x
+        if dir == 'y':
+            # print('colliding on the y')
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                self.vy *= -1
+                self.rect.y = self.y
+    def update(self):
+        self.x += self.vx * self.game.dt
+        self.y += self.vy * self.game.dt
+
+        if self.rect.x < self.game.player.rect.x:
+            self.vx = 100
+        if self.rect.x < self.game.player.rect.x:   
+            self.vx = -100
+        if self.rect.y < self.game.player.rect.y:
+            self.vy = 100
+        if self.rect.y < self.game.player.rect.y:
+            self.vy = -100
+        self.rect.x = self.x 
+        self.collide_with_walls('x')
+        self.rect.y = self.y
+        self.collide_with_walls('y')
 
 
 
