@@ -7,6 +7,8 @@ verbs: Walks (WIP)
 #import neccesary modules
 import pygame as pg 
 import sys
+import random
+import os
 from settings import *
 from sprites import *
 from random import randint
