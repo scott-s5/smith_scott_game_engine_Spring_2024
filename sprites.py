@@ -91,16 +91,14 @@ class Player(pg.sprite.Sprite):
         self.collide_with_walls('y')
         self.collide_with_group(self.game.coins, True)
         self.collide_with_group(self.game.power_ups, True)
+        mob_hits = pg.sprite.spritecollide(self, self.game.mobs, False)
+        if mob_hits:
+            print("Player collided w mob!")
+            self.game.game_over = True
 
         # coin_hits = pg.sprite.spritecollide(self.game.coins, True)
         # if coin_hits:
         #     print("I got a coin")
-
-
-
-
-
-
 
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):

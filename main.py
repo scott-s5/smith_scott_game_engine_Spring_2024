@@ -26,6 +26,7 @@ class Game:
         # setting game clock 
         self.clock = pg.time.Clock()
         self.load_data()
+        self.game_over = False
     def load_data(self):
         game_folder = path.dirname(__file__)
         self.map_data = []
@@ -69,6 +70,11 @@ class Game:
             self.events()
             self.update()
             self.draw()
+            if self.game_over:
+                print("Game over!")
+                self.playing = False
+                pg.quit()
+                sys.exit()
     def quit(self):
          pg.quit()
          sys.exit()
