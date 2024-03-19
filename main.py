@@ -27,15 +27,23 @@ class Game:
         pg.display.set_caption(TITLE)
         # setting game clock 
         self.clock = pg.time.Clock()
+        pg.mixer.init()
+        sound_file1 = os.path.join(os.path.dirname(__file__), 'sounds', 'cleveland.wav')
+        # sound_file2 = os.path.join(os.path.dirname(__file__), 'sounds', 'Magic.wav')
+        self.coin_sound = pg.mixer.Sound(sound_file1)
+        # self.win_sound = pg.mixer.Sound(sound_file2) 
         self.load_data()
         self.game_over = False
+        
     def load_data(self):
-        game_folder = path.dirname(__file__)
+        game_folder = os.path.dirname(__file__)
         self.map_data = []
+        self.total_coins = 0
         with open(path.join(game_folder, 'map.txt'), 'rt') as f:
             for line in f:
                 print(line)
                 self.map_data.append(line)
+                self.total_coins += line.count('C')
 
     # Create run method which runs the whole GAME
     def new(self):
@@ -45,9 +53,6 @@ class Game:
         self.coins = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
         self.power_ups = pg.sprite.Group()
-        # self.player1 = Player(self, 1, 1)
-        # for x in range(10, 20):
-        #     Wall(self, x, 5)
         for row, tiles in enumerate(self.map_data):
             print(row)
             for col, tile in enumerate(tiles):
@@ -83,6 +88,11 @@ class Game:
 
     def update(self):
         self.all_sprites.update()
+        # if self.total_coins == 0:
+            # self.play_winning_sound()
+
+    # def play_winning_sound(self):
+        # self.win_sound.play()
 
     def draw_grid(self):
          for x in range(0, WIDTH, TILESIZE):

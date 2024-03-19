@@ -73,9 +73,13 @@ class Player(pg.sprite.Sprite):
         if hits:
             if str(hits[0].__class__.__name__) == "Coin":
                 self.moneybag += 1
+                if self.game.total_coins > 0:
+                    self.game.total_coins -= 1
+                self.game.coin_sound.play()
         if hits:
             if str(hits[0].__class__.__name__) == "PowerUp":
                 print(hits[0].__class__.__name__)
+                self.game.coin_sound.play()
 
     def update(self):
         self.get_keys()
@@ -93,10 +97,10 @@ class Player(pg.sprite.Sprite):
         if mob_hits:
             print("Player collided w mob!")
             self.game.game_over = True
+        coin_hits = pg.sprite.spritecollide(self, self.game.coins, True)
+        if coin_hits:
+            print("I got a coin")
 
-        # coin_hits = pg.sprite.spritecollide(self.game.coins, True)
-        # if coin_hits:
-        #     print("I got a coin")
 
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
