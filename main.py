@@ -1,4 +1,7 @@
 # This file was created by: Scott Smith
+# sources: Mr. Cozort's github (direct), Mr. Cozort's github (reference), My code from last year (for using images)
+# ... talking to Mr. Cozort for troubleshoot, classmate help, chatGPT to help with a minor bug I was having regarding
+# sound effects.
 
 '''
 goals: moving obstacles, increasing speed of enemies, force field
@@ -38,6 +41,7 @@ class Game:
         # (working on it so that when game is over-> things happen)
         self.load_data()
         self.game_over = False
+        self.win_sound_playing = False
     #runs the data from other files, like the map. also sets up total_coins (I'll go over later)
     def load_data(self):
         game_folder = os.path.dirname(__file__)
@@ -98,8 +102,10 @@ class Game:
    # neccesary function so that the sprites can run. also sets up the 'winning' sound effect (major WIP)
     def update(self):
         self.all_sprites.update()
-        if self.total_coins == 0:
+        if self.total_coins == 0 and not self.win_sound_playing:
             self.win_sound.play()
+            self.win_sound_playing = True
+
 
     #setting up the game screen when the code is actually ran, including the text aspect and tne games dimensions
     # also sets it up so that the existing sprites are actually drawn within the game
