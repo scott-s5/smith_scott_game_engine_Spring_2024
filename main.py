@@ -27,25 +27,32 @@ class Game:
         pg.display.set_caption(TITLE)
         # setting game clock 
         self.clock = pg.time.Clock()
+        # setting the code so that it draws from the .wav files in my sounds folder in my game engine. 
+        # also using pg.mixer to essentially make the sound play
         pg.mixer.init()
         sound_file1 = os.path.join(os.path.dirname(__file__), 'sounds', 'cleveland.wav')
-        # sound_file2 = os.path.join(os.path.dirname(__file__), 'sounds', 'Magic.wav')
+        sound_file2 = os.path.join(os.path.dirname(__file__), 'sounds', 'Magic.wav')
         self.coin_sound = pg.mixer.Sound(sound_file1)
-        # self.win_sound = pg.mixer.Sound(sound_file2) 
+        self.win_sound = pg.mixer.Sound(sound_file2) 
+        # self.game_over = false  just shows that the game is being played and isn't over 
+        # (working on it so that when game is over-> things happen)
         self.load_data()
         self.game_over = False
-        
+    #runs the data from other files, like the map. also sets up total_coins (I'll go over later)
     def load_data(self):
         game_folder = os.path.dirname(__file__)
         self.map_data = []
         self.total_coins = 0
+        #this essentially checks the map for how many coins are currently in the game and makes that the total
+        # coin count
         with open(path.join(game_folder, 'map.txt'), 'rt') as f:
             for line in f:
                 print(line)
                 self.map_data.append(line)
                 self.total_coins += line.count('C')
 
-    # Create run method which runs the whole GAME
+    #tells the game class all the other sprites that in the game
+    # also names the sprite classes so that the can be inserted into the map easily
     def new(self):
         print("create new game...")
         self.all_sprites = pg.sprite.Group()
@@ -70,7 +77,9 @@ class Game:
                     PowerUp(self, col, row)
 
     def run(self):
-        # 
+        # # Create run method which runs the whole GAME
+        # makes it so that if the code ever encounters a scenario in which game_over is executed, the game 
+        # literally closes
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
@@ -82,18 +91,18 @@ class Game:
                 self.playing = False
                 pg.quit()
                 sys.exit()
+        # makes it so that when the game ends, the game - ends, essentially
     def quit(self):
          pg.quit()
          sys.exit()
-
+   # neccesary function so that the sprites can run. also sets up the 'winning' sound effect (major WIP)
     def update(self):
         self.all_sprites.update()
-        # if self.total_coins == 0:
-            # self.play_winning_sound()
+        if self.total_coins == 0:
+            self.win_sound.play()
 
-    # def play_winning_sound(self):
-        # self.win_sound.play()
-
+    #setting up the game screen when the code is actually ran, including the text aspect and tne games dimensions
+    # also sets it up so that the existing sprites are actually drawn within the game
     def draw_grid(self):
          for x in range(0, WIDTH, TILESIZE):
               pg.draw.line(self.screen, LIGHTGRAY, (x, 0), (x, HEIGHT))
@@ -113,7 +122,7 @@ class Game:
             self.draw_text(self.screen, str(self.player.moneybag), 64, WHITE, 1, 1)
 
             pg.display.flip()
-
+# makes it so that in the event of an attempt to quit the game is executed, the game.. actually quits.
     def events(self):
          for event in pg.event.get():
             if event.type == pg.QUIT:

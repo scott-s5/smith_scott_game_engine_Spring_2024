@@ -1,8 +1,5 @@
 # this file was created by Scott Smith
 
-#Create a player class 
-
-#Create a wall class 
 
 #importing modules
 import pygame as pg
@@ -13,6 +10,7 @@ import random
 import time
 from random import randint
 
+#this makes it so that the image files can actually be drawn from the character folder in my game engine
 game_folder = os.path.dirname(__file__)
 img_folder = os.path.join(game_folder, 'characters')
 
@@ -22,6 +20,7 @@ class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
         # init super class
+        # this also sets it up so that the Player class is actually shown as a png, from my characters folder
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.image.load(os.path.join(img_folder, 'BronBron.png')).convert()
@@ -31,7 +30,8 @@ class Player(pg.sprite.Sprite):
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.moneybag = 0
-
+ # this sets up the movement of the player class, so that when certain keys are pressed, certain 'movements' 
+ # are executed
     def get_keys(self):
         self.vx, self.vy = 0, 0
         keys = pg.key.get_pressed()
@@ -47,7 +47,8 @@ class Player(pg.sprite.Sprite):
             self.vx *= 0.7071
             self.vy *= 0.7071
 
-
+ # this makes it so that when the player class interacts with the wall class (both horizontally and vertically),
+ # the walls act as a wall and do not let the player through. 
     def collide_with_walls(self, dir):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
@@ -67,7 +68,8 @@ class Player(pg.sprite.Sprite):
                     self.y = hits[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y
-
+ #this covers the player class' interaction with all the other classes.
+# First, if the player interacts with the coin class, the counter goes up, and the coin collecting sound effect plays.
     def collide_with_group(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
         if hits:
@@ -75,12 +77,15 @@ class Player(pg.sprite.Sprite):
                 self.moneybag += 1
                 if self.game.total_coins > 0:
                     self.game.total_coins -= 1
-                self.game.coin_sound.play()
-        if hits:
-            if str(hits[0].__class__.__name__) == "PowerUp":
-                print(hits[0].__class__.__name__)
-                self.game.coin_sound.play()
+                    self.game.coin_sound.play()
+        # if hits:
+        #     if str(hits[0].__class__.__name__) == "PowerUp":
+        #         print(hits[0].__class__.__name__)
+        #         self.game.win_sound.play()
 
+ # update so that the player has its controls, collision with all groups including walls, and
+ # updated interaction so that when mobs reach player, the game ends, and when player interacts with coin, 
+# print "i got a coin" for my troubleshooting purposes.
     def update(self):
         self.get_keys()
         self.x += self.vx * self.game.dt
@@ -101,7 +106,7 @@ class Player(pg.sprite.Sprite):
         if coin_hits:
             print("I got a coin")
 
-
+#sets up the wall class and its dimensions and color.
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.walls
@@ -114,7 +119,7 @@ class Wall(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-
+#sets up the coin class and uses pg.image to load a png from my characters foler as its image. sets up its dimensions
 class Coin(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.coins
@@ -127,6 +132,7 @@ class Coin(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+    #sets up the mob class with ITS respective png as well as its speed.
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.mobs
@@ -141,6 +147,7 @@ class Mob(pg.sprite.Sprite):
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.speed = 1
+  #sets up its collision with walls interaction so that it can hit walls during gameplay.
     def collide_with_walls(self, dir):
         if dir == 'x':
             # print('colliding on the x')
@@ -154,6 +161,8 @@ class Mob(pg.sprite.Sprite):
             if hits:
                 self.vy *= -1
                 self.rect.y = self.y
+    # update method relating the mob class to the player so that it tries to approach player with its current speed.
+    # runs collide with walls like previously set up.
     def update(self):
         # self.rect.x += 1
         self.x += self.vx * self.game.dt
@@ -171,6 +180,8 @@ class Mob(pg.sprite.Sprite):
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
+    #unused code for now until later, but a powerup class that aspires to altar player speed and 
+    # give player a forcefield. not incorporated to final game currently.
 class PowerUp(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.power_ups
