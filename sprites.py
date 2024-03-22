@@ -28,7 +28,7 @@ class Player(pg.sprite.Sprite):
         self.game = game
         self.image = pg.image.load(os.path.join(img_folder, 'BronBron.png')).convert()
         self.image.set_colorkey(BLACK)
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect() 
         self.vx, self.vy = 0, 0
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -113,7 +113,7 @@ class Player(pg.sprite.Sprite):
         # didn't know you could incorporate an if statement like this, makes it much easier to incorporate 
         # invincibility - now, in all other scenarios, collision with mob= game over, and with invincibility, that is false
         '!!!'
-        if not self.active_invincibility:
+        if not self.invincible:
          mob_hits = pg.sprite.spritecollide(self, self.game.mobs, False)    
          if mob_hits:
             print("Player collided w mob!")

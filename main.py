@@ -101,8 +101,8 @@ class Game:
                 sys.exit()
         # makes it so that when the game ends, the game - ends, essentially
     def quit(self):
-        pg.quit()
-        sys.exit()
+      pg.quit()
+      sys.exit()
    # neccesary function so that the sprites can run. also sets up the 'winning' sound effect-
    #  when the coins left hits 0, the winning sound can play
     def update(self):
