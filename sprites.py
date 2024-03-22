@@ -1,6 +1,5 @@
 # this file was created by Scott Smith
 
-
 #importing modules
 import pygame as pg
 from pygame.sprite import Sprite
@@ -97,11 +96,6 @@ class Player(pg.sprite.Sprite):
         self.invincibility_duration = 5000
         self.invincibility_timer = pg.time.get_ticks() 
  # update so that the player has its controls, collision with all groups including walls, and
- # updated interaction so that when mobs reach player, the game ends, and when player interacts with coin, 
- # print "i got a coin" for my troubleshooting purposes, & sets the timer to decrease on its own and that
- # when the timer expires, invincibility ticks off (chat gpt helped me with the composition of that code - 
- # the equation showing 'now - timer >= duration' which is just the code checking when the timer exceedes 
- # the given 'duration', the invincibility ticks off)
     def update(self):
         self.get_keys()
         self.x += self.vx * self.game.dt
@@ -114,12 +108,20 @@ class Player(pg.sprite.Sprite):
         self.collide_with_walls('y')
         self.collide_with_group(self.game.coins, True)
         self.collide_with_group(self.game.power_ups, True)
+        #  updated interaction so that when mobs reach player, the game ends, 
+        # the 'if not' part of this was chatgpt that made my life endlessly easier, 
+        # didn't know you could incorporate an if statement like this, makes it much easier to incorporate 
+        # invincibility - now, in all other scenarios, collision with mob= game over, and with invincibility, that is false
         '!!!'
         if not self.active_invincibility:
-          mob_hits = pg.sprite.spritecollide(self, self.game.mobs, False)    
-          if mob_hits:
+         mob_hits = pg.sprite.spritecollide(self, self.game.mobs, False)    
+         if mob_hits:
             print("Player collided w mob!")
             self.game.game_over = True
+ # updated it so that when player interacts with coin, print "i got a coin" for my troubleshooting purposes, & sets the timer to decrease on its own and that
+ # when the timer expires, invincibility ticks off (chat gpt helped me with the composition of that code - 
+ # the equation showing 'now - timer >= duration' which is just the code checking when the timer exceedes 
+ # the given 'duration', the invincibility ticks off)    
         coin_hits = pg.sprite.spritecollide(self, self.game.coins, True)
         if coin_hits:
             print("I got a coin")

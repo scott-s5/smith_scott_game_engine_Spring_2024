@@ -18,8 +18,7 @@ from random import randint
 from os import path 
 from time import sleep
 from math import floor
-#initilizing the class
-
+#initilizing the game class
 class Game:
 # Define a special method to init the properties of said class...
     def __init__(self):
@@ -34,7 +33,7 @@ class Game:
         # also using pg.mixer to essentially make the sound play
         # looked at Mr. Cozort's code to see how he did sounds, then used chatGPT to integrate what he did into
         # my code specifically, and it proved mostly unhelpful, so I manually separated the sound files into 
-        # different lines of code rather than a megafolder like it tried to have me do. 
+        # different lines of code rather than a megafolder like it tried to have me do.
         pg.mixer.init()
         sound_file1 = os.path.join(os.path.dirname(__file__), 'sounds', 'cleveland1.wav')
         sound_file2 = os.path.join(os.path.dirname(__file__), 'sounds', 'Magic.wav')
@@ -102,8 +101,8 @@ class Game:
                 sys.exit()
         # makes it so that when the game ends, the game - ends, essentially
     def quit(self):
-         pg.quit()
-         sys.exit()
+        pg.quit()
+        sys.exit()
    # neccesary function so that the sprites can run. also sets up the 'winning' sound effect-
    #  when the coins left hits 0, the winning sound can play
     def update(self):
@@ -146,7 +145,6 @@ class Game:
          for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
-
 # I have instantiated the game
 g = Game()
 # g.show_start_screen()
