@@ -11,6 +11,9 @@ import time
 from random import randint
 
 #this makes it so that the image files can actually be drawn from the character folder in my game engine
+# basically I drew the image idea from last years code, but I didn't import os so when I went to troubleshoot
+# my code from chatGPT I was reminded that import os was missing and these lines of code were needed.
+# not sure where to put it so it is here for now.
 game_folder = os.path.dirname(__file__)
 img_folder = os.path.join(game_folder, 'characters')
 
@@ -21,6 +24,7 @@ class Player(pg.sprite.Sprite):
         self.groups = game.all_sprites
         # init super class
         # this also sets it up so that the Player class is actually shown as a png, from my characters folder
+        # sets up the size of the tiles
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.image.load(os.path.join(img_folder, 'BronBron.png')).convert()
@@ -29,7 +33,11 @@ class Player(pg.sprite.Sprite):
         self.vx, self.vy = 0, 0
         self.x = x * TILESIZE
         self.y = y * TILESIZE
+        # sets the moneybag variable to 0, and makes sure invincibility is off (until activated)
         self.moneybag = 0
+        self.invincible = False
+        self.invincibility_duration = 0
+        self.invincibility_timer = 0
  # this sets up the movement of the player class, so that when certain keys are pressed, certain 'movements' 
  # are executed
     def get_keys(self):
@@ -48,7 +56,7 @@ class Player(pg.sprite.Sprite):
             self.vy *= 0.7071
 
  # this makes it so that when the player class interacts with the wall class (both horizontally and vertically),
- # the walls act as a wall and do not let the player through. 
+ # the walls act as a wall and do not let the player through, or stop it. 
     def collide_with_walls(self, dir):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
@@ -69,7 +77,9 @@ class Player(pg.sprite.Sprite):
                 self.vy = 0
                 self.rect.y = self.y
  #this covers the player class' interaction with all the other classes.
-# First, if the player interacts with the coin class, the counter goes up, and the coin collecting sound effect plays.
+# First, if the player interacts with the coin class:
+#  the counter goes up (drawn from the moneybag variable) and the coin collecting sound effect plays.
+# Next, if the player hits the powerup, the powerup is applied and invincibility kicks on.
     def collide_with_group(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
         if hits:
@@ -78,14 +88,20 @@ class Player(pg.sprite.Sprite):
                 if self.game.total_coins > 0:
                     self.game.total_coins -= 1
                     self.game.coin_sound.play()
-        # if hits:
-        #     if str(hits[0].__class__.__name__) == "PowerUp":
-        #         print(hits[0].__class__.__name__)
-        #         self.game.win_sound.play()
-
+        if hits:
+            if str(hits[0].__class__.__name__) == "PowerUp":
+                hits[0].apply_power_up(self)
+    # clicks invincibility on when activated and sets a timer for how long it lasts. used pg.time for this.
+    def active_invincibility(self):
+        self.invinciblity = True
+        self.invincibility_duration = 5000
+        self.invincibility_timer = pg.time.get_ticks() 
  # update so that the player has its controls, collision with all groups including walls, and
  # updated interaction so that when mobs reach player, the game ends, and when player interacts with coin, 
-# print "i got a coin" for my troubleshooting purposes.
+ # print "i got a coin" for my troubleshooting purposes, & sets the timer to decrease on its own and that
+ # when the timer expires, invincibility ticks off (chat gpt helped me with the composition of that code - 
+ # the equation showing 'now - timer >= duration' which is just the code checking when the timer exceedes 
+ # the given 'duration', the invincibility ticks off)
     def update(self):
         self.get_keys()
         self.x += self.vx * self.game.dt
@@ -98,14 +114,20 @@ class Player(pg.sprite.Sprite):
         self.collide_with_walls('y')
         self.collide_with_group(self.game.coins, True)
         self.collide_with_group(self.game.power_ups, True)
-        mob_hits = pg.sprite.spritecollide(self, self.game.mobs, False)
-        if mob_hits:
+        '!!!'
+        if not self.active_invincibility:
+          mob_hits = pg.sprite.spritecollide(self, self.game.mobs, False)    
+          if mob_hits:
             print("Player collided w mob!")
             self.game.game_over = True
         coin_hits = pg.sprite.spritecollide(self, self.game.coins, True)
         if coin_hits:
             print("I got a coin")
-
+        # powerup_hits = pg.sprite.spritecollide(self, self.game.power_ups, True)
+        if self.invincible:
+            now = pg.time.get_ticks()
+            if now - self.invincibility_timer >= self.invincibility_duration:
+                self.invinciblity = False
 #sets up the wall class and its dimensions and color.
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -150,13 +172,11 @@ class Mob(pg.sprite.Sprite):
   #sets up its collision with walls interaction so that it can hit walls during gameplay.
     def collide_with_walls(self, dir):
         if dir == 'x':
-            # print('colliding on the x')
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
             if hits:
                 self.vx *= -1
                 self.rect.x = self.x
         if dir == 'y':
-            # print('colliding on the y')
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
             if hits:
                 self.vy *= -1
@@ -180,50 +200,16 @@ class Mob(pg.sprite.Sprite):
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
-    #unused code for now until later, but a powerup class that aspires to altar player speed and 
-    # give player a forcefield. not incorporated to final game currently.
+#powerup class with its respective png and size, and also has the apply_power_up method 
 class PowerUp(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.power_ups
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(YELLOW)
-        self.image.fill(MAGENTA)
+        self.image = pg.image.load(os.path.join(img_folder, 'kyrie.png')).convert()
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-    def __init__(self, game, x, y):
-        self.speed = 1
-    def collide_with_walls(self, dir):
-        if dir == 'x':
-            print('colliding on the x')
-            # print('colliding on the x')
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
-            if hits:
-                self.vx *= -1
-                self.rect.x = self.x
-        if dir == 'y':
-            print('colliding on the y')
-            # print('colliding on the y')
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
-            if hits:
-                self.vy *= -1
-                self.rect.y = self.y
-    def update(self):
-        # self.rect.x += 1
-        self.x += self.vx * self.game.dt
-        self.y += self.vy * self.game.dt
-        
-        if self.rect.x < self.game.player.rect.x:
-            self.vx = 100
-        if self.rect.x > self.game.player.rect.x:
-            self.vx = -100    
-        if self.rect.y < self.game.player.rect.y:
-            self.vy = 100
-        if self.rect.y > self.game.player.rect.y:
-            self.vy = -100
-        self.rect.x = self.x
-        self.collide_with_walls('x')
-        self.rect.y = self.y
-        self.collide_with_walls('y')
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+    def apply_power_up(self, player):
+        player.active_invincibility()

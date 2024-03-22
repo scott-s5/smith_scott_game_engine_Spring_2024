@@ -1,10 +1,10 @@
 # This file was created by: Scott Smith
-# sources: Mr. Cozort's github (direct), Mr. Cozort's github (reference), My code from last year (for using images)
-# ... talking to Mr. Cozort for troubleshoot, classmate help, chatGPT to help with a minor bug I was having regarding
-# sound effects.
+# sources: Mr. Cozort's github (direct), Mr. Cozort's github (reference), My code from last year (for using images & misc.)
+# ... talking to Mr. Cozort for troubleshoot, classmate help, chatGPT (to be explained when used)
 
 '''
-goals: moving obstacles, increasing speed of enemies, force field
+goals: moving obstacles that kill player, 
++ force field protecting player, + winning sound+text+effect when all coins are collected
 verbs: Walks (WIP)
 '''
 #import neccesary modules
@@ -32,12 +32,16 @@ class Game:
         self.clock = pg.time.Clock()
         # setting the code so that it draws from the .wav files in my sounds folder in my game engine. 
         # also using pg.mixer to essentially make the sound play
+        # looked at Mr. Cozort's code to see how he did sounds, then used chatGPT to integrate what he did into
+        # my code specifically, and it proved mostly unhelpful, so I manually separated the sound files into 
+        # different lines of code rather than a megafolder like it tried to have me do. 
         pg.mixer.init()
-        sound_file1 = os.path.join(os.path.dirname(__file__), 'sounds', 'cleveland.wav')
+        sound_file1 = os.path.join(os.path.dirname(__file__), 'sounds', 'cleveland1.wav')
         sound_file2 = os.path.join(os.path.dirname(__file__), 'sounds', 'Magic.wav')
         self.coin_sound = pg.mixer.Sound(sound_file1)
         self.win_sound = pg.mixer.Sound(sound_file2) 
-        # self.game_over = false  just shows that the game is being played and isn't over 
+        # self.game_over = false  just shows that the game is being played and isn't over, &
+        # win_sound shows that the win sound isn't playing during start of game.
         # (working on it so that when game is over-> things happen)
         self.load_data()
         self.game_over = False
@@ -48,7 +52,8 @@ class Game:
         self.map_data = []
         self.total_coins = 0
         #this essentially checks the map for how many coins are currently in the game and makes that the total
-        # coin count
+        # coin count (ChatGPT helped me with the 'linecount'; basically it's easier to count down from the amount
+        # of total coins than use moneybag for the feature I am about to use)
         with open(path.join(game_folder, 'map.txt'), 'rt') as f:
             for line in f:
                 print(line)
@@ -83,7 +88,7 @@ class Game:
     def run(self):
         # # Create run method which runs the whole GAME
         # makes it so that if the code ever encounters a scenario in which game_over is executed, the game 
-        # literally closes
+        # literally closes (print function is for debugging)
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
@@ -99,7 +104,8 @@ class Game:
     def quit(self):
          pg.quit()
          sys.exit()
-   # neccesary function so that the sprites can run. also sets up the 'winning' sound effect (major WIP)
+   # neccesary function so that the sprites can run. also sets up the 'winning' sound effect-
+   #  when the coins left hits 0, the winning sound can play
     def update(self):
         self.all_sprites.update()
         if self.total_coins == 0 and not self.win_sound_playing:
@@ -109,6 +115,7 @@ class Game:
 
     #setting up the game screen when the code is actually ran, including the text aspect and tne games dimensions
     # also sets it up so that the existing sprites are actually drawn within the game
+    # uses pg.font to give the code a font to draw with, and sets up the size of that text.
     def draw_grid(self):
          for x in range(0, WIDTH, TILESIZE):
               pg.draw.line(self.screen, LIGHTGRAY, (x, 0), (x, HEIGHT))
@@ -121,14 +128,20 @@ class Game:
         text_rect = text_surface.get_rect()
         text_rect.topleft = (x*TILESIZE,y*TILESIZE)
         surface.blit(text_surface, text_rect)
+        # sets up using the text within pg.font and draw_text
     def draw(self):
             self.screen.fill(BGCOLOR)
             self.draw_grid()
             self.all_sprites.draw(self.screen)
+            #this displays the number of coins *collected* via the moneybag variable using draw_text
             self.draw_text(self.screen, str(self.player.moneybag), 64, WHITE, 1, 1)
+            #this displays a winning screen text using draw-text
+            if self.total_coins == 0:
+                self.draw_text(self.screen, "You win!", 64, GREEN, 13, 12)
 
             pg.display.flip()
-# makes it so that in the event of an attempt to quit the game is executed, the game.. actually quits.
+ # makes it so that in the event of an attempt to quit the game is executed, the game.. actually quits.
+
     def events(self):
          for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -141,4 +154,3 @@ g = Game()
 while True:
     g.new()
     g.run()
-    # g.show_go_screen()
