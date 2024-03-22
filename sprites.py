@@ -218,6 +218,7 @@ class PowerUp(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+        # defines what happens when the power up is applied (invincibility is ticked on)
     def apply_power_up(self, player):
         player.active_invincibility()
         player.invincible = True

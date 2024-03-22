@@ -29,7 +29,7 @@ class Game:
         pg.display.set_caption(TITLE)
         # setting game clock 
         self.clock = pg.time.Clock()
-        # setting the code so that it draws from the .wav files in my sounds folder in my game engine. 
+        # setting the code so that it draws from the .wav or .mp3 files in my sounds folder in my game engine. 
         # also using pg.mixer to essentially make the sound play
         # looked at Mr. Cozort's code to see how he did sounds, then used chatGPT to integrate what he did into
         # my code specifically, and it proved mostly unhelpful, so I manually separated the sound files into 
