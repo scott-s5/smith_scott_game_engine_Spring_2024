@@ -135,6 +135,8 @@ class Player(pg.sprite.Sprite):
             self.image.set_colorkey(BLACK)
             if now - self.invincibility_timer >= self.invincibility_duration:
                 self.invinciblity = False
+                self.image = pg.image.load(os.path.join(img_folder, 'BronBron.png')).convert()   
+                self.image.set_colorkey(BLACK)
 #sets up the wall class and its dimensions and color.
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
