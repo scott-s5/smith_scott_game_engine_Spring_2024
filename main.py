@@ -37,8 +37,10 @@ class Game:
         pg.mixer.init()
         sound_file1 = os.path.join(os.path.dirname(__file__), 'sounds', 'cleveland1.wav')
         sound_file2 = os.path.join(os.path.dirname(__file__), 'sounds', 'Magic.wav')
+        sound_file3 = os.path.join(os.path.dirname(__file__), 'sounds', 'powerup.mp3')
         self.coin_sound = pg.mixer.Sound(sound_file1)
         self.win_sound = pg.mixer.Sound(sound_file2) 
+        self.powerup_sound = pg.mixer.Sound(sound_file3)
         # self.game_over = false  just shows that the game is being played and isn't over, &
         # win_sound shows that the win sound isn't playing during start of game.
         # (working on it so that when game is over-> things happen)

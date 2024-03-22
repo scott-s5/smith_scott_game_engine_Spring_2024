@@ -90,6 +90,7 @@ class Player(pg.sprite.Sprite):
         if hits:
             if str(hits[0].__class__.__name__) == "PowerUp":
                 hits[0].apply_power_up(self)
+                self.game.powerup_sound.play()
     # clicks invincibility on when activated and sets a timer for how long it lasts. used pg.time for this.
     def active_invincibility(self):
         self.invinciblity = True
@@ -114,7 +115,9 @@ class Player(pg.sprite.Sprite):
         # invincibility - now, in all other scenarios, collision with mob= game over, and with invincibility, that is false
         '!!!'
         if not self.invincible:
-         mob_hits = pg.sprite.spritecollide(self, self.game.mobs, False)    
+         mob_hits = pg.sprite.spritecollide(self, self.game.mobs, False)
+         self.image = pg.image.load(os.path.join(img_folder, 'BronBron.png')).convert()   
+         self.image.set_colorkey(BLACK)
          if mob_hits:
             print("Player collided w mob!")
             self.game.game_over = True
@@ -128,6 +131,8 @@ class Player(pg.sprite.Sprite):
         # powerup_hits = pg.sprite.spritecollide(self, self.game.power_ups, True)
         if self.invincible:
             now = pg.time.get_ticks()
+            self.image = pg.image.load(os.path.join(img_folder, 'Broncavs.png')).convert()
+            self.image.set_colorkey(BLACK)
             if now - self.invincibility_timer >= self.invincibility_duration:
                 self.invinciblity = False
 #sets up the wall class and its dimensions and color.
@@ -215,3 +220,4 @@ class PowerUp(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE
     def apply_power_up(self, player):
         player.active_invincibility()
+        player.invincible = True
