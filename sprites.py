@@ -15,8 +15,22 @@ from random import randint
 # not sure where to put it so it is here for now.
 game_folder = os.path.dirname(__file__)
 img_folder = os.path.join(game_folder, 'characters')
+SPRITESHEET = '....png'
 
 
+#incorporating the spritesheet class to allow animated sprites
+'''class Spritesheet:
+    # utility class for loading and parsing spritesheets
+    def __init__(self, filename):
+        self.spritesheet = pg.image.load(filename).convert()
+
+    def get_image(self, x, y, width, height):
+        # grab an image out of a larger spritesheet
+        image = pg.Surface((width, height))
+        image.blit(self.spritesheet, (0, 0), (x, y, width, height))
+        # image = pg.transform.scale(image, (width, height))
+        image = pg.transform.scale(image, (width * 4, height * 4))
+        return image'''
 #creating player class
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -28,6 +42,18 @@ class Player(pg.sprite.Sprite):
         self.game = game
         self.image = pg.image.load(os.path.join(img_folder, 'BronBron.png')).convert()
         self.image.set_colorkey(BLACK)
+        '''
+        # self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
+        # self.spritesheet = Spritesheet(path.join(img_folder, SPRITESHEET))
+        # self.load_images()
+        # self.image = self.standing_frames[0]  
+        # self.rect = self.image.get_rect()
+        # self.jumping = False
+        # self.walking = False
+        # self.current_frame = 0
+        # self.last_update = 0
+        # self.material = True
+        '''
         self.rect = self.image.get_rect() 
         self.vx, self.vy = 0, 0
         self.x = x * TILESIZE
@@ -53,7 +79,16 @@ class Player(pg.sprite.Sprite):
         if self.vx != 0 and self.vy != 0:
             self.vx *= 0.7071
             self.vy *= 0.7071
-
+    '''
+    def load_images(self):
+        self.standing_frames = [self.spritesheet.get_image(0,0, 32, 32), 
+                                self.spritesheet.get_image(32,0, 32, 32)]
+    def animate(self):
+        now = pg.time.get_ticks()
+        if now - self.last_update > 350:
+        self.rect = self.image.get_rect()
+        self.rect.bottom = bottom
+    '''
  # this makes it so that when the player class interacts with the wall class (both horizontally and vertically),
  # the walls act as a wall and do not let the player through, or stop it. 
     def collide_with_walls(self, dir):
@@ -98,7 +133,9 @@ class Player(pg.sprite.Sprite):
         self.invincibility_timer = pg.time.get_ticks() 
  # update so that the player has its controls, collision with all groups including walls, and
     def update(self):
+        '''self.animate()'''
         self.get_keys()
+        '''self.chasing()'''
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
         self.rect.x = self.x

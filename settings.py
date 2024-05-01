@@ -4,7 +4,7 @@ TITLE = "My videogame 2: Electric Boogaloo"
 WIDTH = 1024
 #24 grids wide
 HEIGHT = 768
-FPS = 50
+FPS = 120
 PLAYER_SPEED = 300
 TILESIZE = 32
 mpos = (0,0)

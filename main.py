@@ -6,6 +6,8 @@
 goals: moving obstacles that kill player, 
 + force field protecting player, + winning sound+text+effect when all coins are collected
 verbs: Walks (WIP)
+
+beta goal: levels/secret levels (fixing animating sprites too)
 '''
 #import neccesary modules
 import pygame as pg 
@@ -29,6 +31,7 @@ class Game:
         pg.display.set_caption(TITLE)
         # setting game clock 
         self.clock = pg.time.Clock()
+        # setting the code so that it draws from the .wav files in my sounds folder in my game engine. 
         # setting the code so that it draws from the .wav or .mp3 files in my sounds folder in my game engine. 
         # also using pg.mixer to essentially make the sound play
         # looked at Mr. Cozort's code to see how he did sounds, then used chatGPT to integrate what he did into
@@ -60,7 +63,6 @@ class Game:
                 print(line)
                 self.map_data.append(line)
                 self.total_coins += line.count('C')
-
     #tells the game class all the other sprites that in the game
     # also names the sprite classes so that the can be inserted into the map easily
     def new(self):
@@ -85,7 +87,6 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'U':
                     PowerUp(self, col, row)
-
     def run(self):
         # # Create run method which runs the whole GAME
         # makes it so that if the code ever encounters a scenario in which game_over is executed, the game 
@@ -112,8 +113,6 @@ class Game:
         if self.total_coins == 0 and not self.win_sound_playing:
             self.win_sound.play()
             self.win_sound_playing = True
-
-
     #setting up the game screen when the code is actually ran, including the text aspect and tne games dimensions
     # also sets it up so that the existing sprites are actually drawn within the game
     # uses pg.font to give the code a font to draw with, and sets up the size of that text.
@@ -139,10 +138,8 @@ class Game:
             #this displays a winning screen text using draw-text
             if self.total_coins == 0:
                 self.draw_text(self.screen, "You win!", 64, GREEN, 13, 12)
-
             pg.display.flip()
  # makes it so that in the event of an attempt to quit the game is executed, the game.. actually quits.
-
     def events(self):
          for event in pg.event.get():
             if event.type == pg.QUIT:
