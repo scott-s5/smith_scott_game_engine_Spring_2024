@@ -23,7 +23,6 @@ SPRITESHEET = '....png'
     # utility class for loading and parsing spritesheets
     def __init__(self, filename):
         self.spritesheet = pg.image.load(filename).convert()
-
     def get_image(self, x, y, width, height):
         # grab an image out of a larger spritesheet
         image = pg.Surface((width, height))
@@ -79,6 +78,7 @@ class Player(pg.sprite.Sprite):
         if self.vx != 0 and self.vy != 0:
             self.vx *= 0.7071
             self.vy *= 0.7071
+
     '''
     def load_images(self):
         self.standing_frames = [self.spritesheet.get_image(0,0, 32, 32), 

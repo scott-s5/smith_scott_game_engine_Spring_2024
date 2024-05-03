@@ -50,6 +50,8 @@ class Game:
         self.load_data()
         self.game_over = False
         self.win_sound_playing = False
+        self.start_time = pg.time.get_ticks()
+        self.time_limit = 30000
     #runs the data from other files, like the map. also sets up total_coins (I'll go over later)
     def load_data(self):
         game_folder = os.path.dirname(__file__)
@@ -63,6 +65,7 @@ class Game:
                 print(line)
                 self.map_data.append(line)
                 self.total_coins += line.count('C')
+
     #tells the game class all the other sprites that in the game
     # also names the sprite classes so that the can be inserted into the map easily
     def new(self):
@@ -87,6 +90,7 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'U':
                     PowerUp(self, col, row)
+
     def run(self):
         # # Create run method which runs the whole GAME
         # makes it so that if the code ever encounters a scenario in which game_over is executed, the game 
@@ -113,6 +117,8 @@ class Game:
         if self.total_coins == 0 and not self.win_sound_playing:
             self.win_sound.play()
             self.win_sound_playing = True
+
+
     #setting up the game screen when the code is actually ran, including the text aspect and tne games dimensions
     # also sets it up so that the existing sprites are actually drawn within the game
     # uses pg.font to give the code a font to draw with, and sets up the size of that text.
@@ -135,11 +141,20 @@ class Game:
             self.all_sprites.draw(self.screen)
             #this displays the number of coins *collected* via the moneybag variable using draw_text
             self.draw_text(self.screen, str(self.player.moneybag), 64, WHITE, 1, 1)
+            rainbow_index = (pg.time.get_ticks() // 100) % len(RAINBOW_COLORS)
+            rainbow_color = RAINBOW_COLORS[rainbow_index]
+            elapsed_time = pg.time.get_ticks() - self.start_time
             #this displays a winning screen text using draw-text
             if self.total_coins == 0:
-                self.draw_text(self.screen, "You win!", 64, GREEN, 13, 12)
+             if elapsed_time <= self.time_limit: 
+                self.draw_text(self.screen, "You unlocked secret level!", 64, rainbow_color, 9, 7)
+             else:
+                self.draw_text(self.screen, "You win! Loading next level", 64, rainbow_color, 9, 7)
+                # self.draw_text(self.screen, "You win! Loading next level...", 64, rainbow_color, 9, 7)
+
             pg.display.flip()
  # makes it so that in the event of an attempt to quit the game is executed, the game.. actually quits.
+
     def events(self):
          for event in pg.event.get():
             if event.type == pg.QUIT:
