@@ -22,6 +22,8 @@ from time import sleep
 from math import floor
 
 # Initializing the game class
+# Puts the clock, sounds, powerups, and timers in the game class so that when the code runs those things exist.
+#ChatGPT helped with sound files
 class Game:
     def __init__(self):
         pg.init()
@@ -40,8 +42,9 @@ class Game:
         self.game_over = False
         self.win_sound_playing = False
         self.start_time = pg.time.get_ticks()
-        self.time_limit = 30000
-
+        self.time_limit = 25000
+# load data is a neccesary method that essentially draws from other files to fit it within the game class
+# sets total coins to 0 (important later)
     def load_data(self):
         game_folder = os.path.dirname(__file__)
         self.map_data = []
@@ -51,6 +54,7 @@ class Game:
                 print(line)
                 self.map_data.append(line)
                 self.total_coins += line.count('C')
+# a method that groups together all the sprites and inserts them in the map represented by a letter or number.
 
     def new(self):
         print("create new game...")
@@ -74,7 +78,7 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'U':
                     PowerUp(self, col, row)
-
+# method that tells the game to run and tells the game what to do if game is over (pg.quit)
     def run(self):
         self.playing = True
         while self.playing:
@@ -87,11 +91,13 @@ class Game:
                 self.playing = False
                 pg.quit()
                 sys.exit()
-
+# defines quit
     def quit(self):
         pg.quit()
         sys.exit()
-
+# neccesary method that updates the game code as it runs, makes it so that when all coins are collected, to load 
+# the next map file and play the winning sound. 
+#ChatGPT aided me with all of this. 
     def update(self):
         self.all_sprites.update()
         if self.total_coins == 0 and not self.win_sound_playing:
@@ -101,13 +107,13 @@ class Game:
             self.load_data()  # Load the new map data
             self.new()  # Start a new game with the new map
             self.run()  # Run the new game
-
+# sets up drawing within the grid
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
             pg.draw.line(self.screen, LIGHTGRAY, (x, 0), (x, HEIGHT))
         for y in range(0, HEIGHT, TILESIZE):
             pg.draw.line(self.screen, LIGHTGRAY, (0, y), (WIDTH, y))
-
+# sets up text within the grid
     def draw_text(self, surface, text, size, color, x, y):
         font_name = pg.font.match_font('arial')
         font = pg.font.Font(font_name, size)
@@ -115,7 +121,10 @@ class Game:
         text_rect = text_surface.get_rect()
         text_rect.topleft = (x * TILESIZE, y * TILESIZE)
         surface.blit(text_surface, text_rect)
-
+#describes all that that needs to be drawn. in this case, i set up a cycle between all the colors in order to give a 
+# rainbow text effect. I also made it so that text displays when all coins are collected and the game is won, and made
+# it so that depending on how fast the level was completed, different types of text would display. 
+# ChatGPt helped me with the timer that differenciates the text displaying. 
     def draw(self):
         self.screen.fill(BGCOLOR)
         self.draw_grid()
@@ -128,9 +137,9 @@ class Game:
             if elapsed_time <= self.time_limit:
                 self.draw_text(self.screen, "You unlocked secret level!", 64, rainbow_color, 9, 7)
             else:
-                self.draw_text(self.screen, "You win! Loading next level!", 64, rainbow_color, 9, 7)
+                self.draw_text(self.screen, "You win!", 64, rainbow_color, 9, 7)
         pg.display.flip()
-
+# tells the code what to do in the event of pg.quit
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
